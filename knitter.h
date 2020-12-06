@@ -38,6 +38,7 @@ class Knitter {
 
   void isr();
   void fsm();
+  void reportStatus();
   bool startOperation(byte startNeedle,
                       byte stopNeedle,
                       bool continuousReportingEnabled,
@@ -45,6 +46,8 @@ class Knitter {
   bool startTest(void);
   bool setNextLine(byte lineNumber);
   void setLastLine();
+  void i2c_write(byte address, byte command, byte value);
+  byte i2c_read(byte address, byte command);
 
  private:
   SLIPPacketSerial* m_packetSerial;

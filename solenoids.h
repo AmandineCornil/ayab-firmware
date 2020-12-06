@@ -31,6 +31,8 @@ This file is part of AYAB.
 #define I2Caddr_sol1_8  0x0
 #define I2Caddr_sol9_16 0x1
 
+#define MPC23008_IODIR 0x00
+#define MPC23008_OLAT  0x0a
 
 class Solenoids {
  public:
@@ -38,6 +40,9 @@ class Solenoids {
   void init(void);
   void setSolenoid(byte solenoid, bool state);
   void setSolenoids(uint16 state);
+  uint16 getSolenoids(void);
+  void i2c_write(byte address, byte command, byte value);
+  byte i2c_read(byte address, byte command);
 
  private:
   uint16 solenoidState;

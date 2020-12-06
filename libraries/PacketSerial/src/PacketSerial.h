@@ -202,13 +202,15 @@ public:
                                                             _receiveBufferIndex,
                                                             _decodeBuffer);
 
-                    if (_onPacketFunction)
-                    {
-                        _onPacketFunction(_decodeBuffer, numDecoded);
-                    }
-                    else if (_onPacketFunctionWithSender)
-                    {
-                        _onPacketFunctionWithSender(this, _decodeBuffer, numDecoded);
+                    if (numDecoded > 0) {
+                        if (_onPacketFunction)
+                        {
+                            _onPacketFunction(_decodeBuffer, numDecoded);
+                        }
+                        else if (_onPacketFunctionWithSender)
+                        {
+                            _onPacketFunctionWithSender(this, _decodeBuffer, numDecoded);
+                        }
                     }
                 }
 

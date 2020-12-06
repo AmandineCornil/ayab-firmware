@@ -176,22 +176,25 @@ void SoftI2CMaster::i2c_writebit( uint8_t c )
         i2c_sda_lo();
     }
 
+    _delay_us(i2cbitdelay);
+
     i2c_scl_hi();
     _delay_us(i2cbitdelay);
 
     i2c_scl_lo();
     _delay_us(i2cbitdelay);
 
-    if ( c > 0 ) {
-        i2c_sda_lo();
-    }
-    _delay_us(i2cbitdelay);
+//    if ( c > 0 ) {
+//        i2c_sda_lo();
+//    }
+//    _delay_us(i2cbitdelay);
 }
 
 //
 uint8_t SoftI2CMaster::i2c_readbit(void)
 {
     i2c_sda_hi();
+    _delay_us(i2cbitdelay);
     i2c_scl_hi();
     _delay_us(i2cbitdelay);
 
@@ -261,6 +264,9 @@ void SoftI2CMaster::i2c_repstart(void)
 //
 void SoftI2CMaster::i2c_stop(void)
 {
+    i2c_sda_lo();
+    _delay_us(i2cbitdelay);
+    
     i2c_scl_hi();
     _delay_us(i2cbitdelay);
 

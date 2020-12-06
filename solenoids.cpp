@@ -62,7 +62,15 @@ void Solenoids::init(void)
         mcp_1.pinMode(i, OUTPUT);
     }
   #endif
-  // No Action needed for SOFT_I2C
+    // Configure all ports as output (input at power up)
+    Wire.beginTransmission(I2Caddr_sol1_8 | 0x20);
+    Wire.send(MPC23008_IODIR);
+    Wire.send(0x00);
+    Wire.endTransmission();
+    Wire.beginTransmission(I2Caddr_sol9_16 | 0x20);
+    Wire.send(MPC23008_IODIR);
+    Wire.send(0x00);
+    Wire.endTransmission();
 }
 
 void Solenoids::setSolenoid(byte solenoid, bool state) {
@@ -83,6 +91,9 @@ void Solenoids::setSolenoids(uint16 state) {
   write(state);
 }
 
+uint16 Solenoids::getSolenoids(void) {
+  return solenoidState;
+}
 
 /*
  * Private Methods
@@ -100,10 +111,30 @@ void Solenoids::write(uint16 newState) {
     mcp_1.writeGPIO(highByte(newState));
   #elif defined SOFT_I2C
     Wire.beginTransmission(I2Caddr_sol1_8 | 0x20);
+    Wire.send(MPC23008_OLAT);
     Wire.send(lowByte(newState));
     Wire.endTransmission();
     Wire.beginTransmission(I2Caddr_sol9_16 | 0x20);
+    Wire.send(MPC23008_OLAT);
     Wire.send(highByte(newState));
     Wire.endTransmission();
   #endif
+}
+
+void Solenoids::i2c_write(byte address, byte command, byte value) {
+    Wire.beginTransmission(address);
+    Wire.send(command);
+    Wire.send(value);
+    Wire.endTransmission();
+}
+
+byte Solenoids::i2c_read(byte address, byte command) {
+    byte res;
+
+    Wire.beginTransmission(address);
+    Wire.send(command);
+    Wire.requestFrom(address);
+    res = Wire.receiveLast();
+    Wire.endTransmission();
+    return res;  
 }

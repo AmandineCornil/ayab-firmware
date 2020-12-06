@@ -36,6 +36,14 @@ Knitter::Knitter(SLIPPacketSerial* packetSerial) {
   m_solenoids.init();
 }
 
+void Knitter::i2c_write(byte address, byte command, byte value) {
+  m_solenoids.i2c_write(address, command, value);
+}
+
+byte Knitter::i2c_read(byte address, byte command) {
+  return m_solenoids.i2c_read(address, command);
+}
+
 void Knitter::isr() {
   // Update machine state data
   m_encoders.encA_interrupt();
@@ -67,6 +75,10 @@ void Knitter::fsm() {
     default:
       break;
   }
+}
+
+void Knitter::reportStatus(){
+  indState();
 }
 
 bool Knitter::startOperation(byte startNeedle,
@@ -355,7 +367,7 @@ void Knitter::reqLine(byte lineNumber) {
 }
 
 void Knitter::indState(bool initState) {
-  uint8_t payload[9];
+  uint8_t payload[15];
   payload[0] = indState_msgid;
   payload[1] = (byte)initState;
 
@@ -370,5 +382,16 @@ void Knitter::indState(bool initState) {
   payload[6] = (byte)m_carriage;
   payload[7] = (byte)m_position;
   payload[8] = (byte)m_encoders.getDirection();
-  m_packetSerial->send(payload, 9);
+
+  payload[9] = (byte)m_hallActive;
+  payload[10] = (byte)m_beltshift;
+
+  payload[11] = m_startNeedle;
+  payload[12] = m_stopNeedle;
+
+  uint16 solenoids = m_solenoids.getSolenoids();
+  payload[13] = (byte)(solenoids >> 8) & 0xFF;
+  payload[14] = (byte)solenoids & 0xFF;
+
+  m_packetSerial->send(payload, 15);
 }
